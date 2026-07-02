@@ -324,26 +324,26 @@ export default function ScanPage(props) {
                 Registered to: {registeredStaff?.name}
               </div>
 
-              {cameraActive ? (
-                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: '1rem' }}>
-                  <video 
-                    ref={videoRef} 
-                    autoPlay 
-                    playsInline 
-                    muted
-                    style={{ width: '100%', maxWidth: '300px', borderRadius: '8px', border: '2px solid #e5e7eb', marginBottom: '1rem', transform: 'scaleX(-1)' }} 
-                  />
-                  <canvas ref={canvasRef} style={{ display: 'none' }} />
-                  <div style={{ display: 'flex', gap: '0.5rem', width: '100%' }}>
-                    <button className="scan-btn" style={{ flex: 1, background: '#16a34a', color: '#fff' }} onClick={captureAndSubmit} disabled={submitting}>
-                      📸 Capture & Submit
-                    </button>
-                    <button className="scan-btn btn-outline" style={{ flex: 1 }} onClick={stopCamera} disabled={submitting}>
-                      Cancel
-                    </button>
-                  </div>
+              <div style={{ display: cameraActive ? 'flex' : 'none', flexDirection: 'column', alignItems: 'center', marginBottom: '1rem' }}>
+                <video 
+                  ref={videoRef} 
+                  autoPlay 
+                  playsInline 
+                  muted
+                  style={{ width: '100%', maxWidth: '300px', borderRadius: '8px', border: '2px solid #e5e7eb', marginBottom: '1rem', transform: 'scaleX(-1)' }} 
+                />
+                <canvas ref={canvasRef} style={{ display: 'none' }} />
+                <div style={{ display: 'flex', gap: '0.5rem', width: '100%' }}>
+                  <button className="scan-btn" style={{ flex: 1, background: '#16a34a', color: '#fff' }} onClick={captureAndSubmit} disabled={submitting}>
+                    📸 Capture & Submit
+                  </button>
+                  <button className="scan-btn btn-outline" style={{ flex: 1 }} onClick={stopCamera} disabled={submitting}>
+                    Cancel
+                  </button>
                 </div>
-              ) : (
+              </div>
+
+              {!cameraActive && (
                 <div className="scan-buttons" style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
                   <div style={{ display: 'flex', gap: '0.5rem' }}>
                     <button className="scan-btn scan-btn-checkin" onClick={() => startAttendanceAction('checkin')} disabled={submitting}>
