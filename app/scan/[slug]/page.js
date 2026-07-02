@@ -330,6 +330,7 @@ export default function ScanPage(props) {
                     ref={videoRef} 
                     autoPlay 
                     playsInline 
+                    muted
                     style={{ width: '100%', maxWidth: '300px', borderRadius: '8px', border: '2px solid #e5e7eb', marginBottom: '1rem', transform: 'scaleX(-1)' }} 
                   />
                   <canvas ref={canvasRef} style={{ display: 'none' }} />
