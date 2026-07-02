@@ -88,7 +88,7 @@ export async function POST(request) {
       
       if (distanceMeters > ALLOWED_RADIUS_METERS) {
         return NextResponse.json({ 
-          error: `You are outside the ${ALLOWED_RADIUS_METERS} meter office radius. Action cannot be marked.` 
+          error: `You are ${Math.round(distanceMeters)} meters away. You must be within ${ALLOWED_RADIUS_METERS} meters of the office.` 
         }, { status: 403 });
       }
 

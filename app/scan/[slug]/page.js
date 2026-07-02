@@ -163,7 +163,9 @@ export default function ScanPage(props) {
     setSubmitting(true);
 
     try {
-      // 1. Request Camera
+      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        throw new Error('Camera API not supported (requires HTTPS or secure browser).');
+      }
       const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' } });
       if (videoRef.current) {
         videoRef.current.srcObject = stream;
@@ -171,7 +173,7 @@ export default function ScanPage(props) {
       setCameraActive(true);
       setSubmitting(false);
     } catch (err) {
-      setMessage({ type: 'error', text: 'Camera permission denied or not available.' });
+      setMessage({ type: 'error', text: `Camera Error: ${err.message}` });
       setSubmitting(false);
       setPendingAction(null);
     }
@@ -209,7 +211,7 @@ export default function ScanPage(props) {
         executeAttendanceAction(pendingAction, photoBase64, latitude, longitude, accuracy);
       },
       (error) => {
-        setMessage({ type: 'error', text: 'Location permission is required to check in.' });
+        setMessage({ type: 'error', text: `GPS Error: ${error.message}` });
         setSubmitting(false);
         setPendingAction(null);
       },
