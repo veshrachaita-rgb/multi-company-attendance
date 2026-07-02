@@ -1,0 +1,306 @@
+/* ============================================================
+   SCAN PAGE STYLES — Mobile-First Staff Scan Page
+   ============================================================ */
+
+.scan-page {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.scan-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-lg);
+  max-width: 480px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.scan-card {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(20px);
+  border-radius: var(--radius-xl);
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  padding: var(--space-xl);
+  width: 100%;
+  animation: slideUp 0.5s ease;
+}
+
+.scan-header {
+  text-align: center;
+  margin-bottom: var(--space-xl);
+}
+
+.scan-company-name {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: var(--color-text);
+  margin-bottom: var(--space-xs);
+  letter-spacing: -0.025em;
+}
+
+.scan-subtitle {
+  font-size: 0.875rem;
+  color: var(--color-text-muted);
+  font-weight: 400;
+}
+
+.scan-datetime {
+  text-align: center;
+  margin-bottom: var(--space-xl);
+  padding: var(--space-lg);
+  background: linear-gradient(135deg, #f8fafc, #eef2ff);
+  border-radius: var(--radius-lg);
+}
+
+.scan-date {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--color-text);
+  margin-bottom: var(--space-xs);
+}
+
+.scan-time {
+  font-size: 2.5rem;
+  font-weight: 800;
+  color: var(--color-primary);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.025em;
+}
+
+.scan-form {
+  margin-bottom: var(--space-lg);
+}
+
+.scan-select {
+  width: 100%;
+  padding: 0.875rem 1rem;
+  font-size: 1rem;
+  font-family: inherit;
+  font-weight: 500;
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface);
+  color: var(--color-text);
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.75rem center;
+  padding-right: 2.5rem;
+  transition: all var(--transition-fast);
+  outline: none;
+}
+
+.scan-select:focus {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 4px var(--color-primary-50);
+}
+
+.scan-buttons {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-md);
+  margin-top: var(--space-lg);
+}
+
+.scan-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-lg) var(--space-md);
+  font-family: inherit;
+  font-size: 1rem;
+  font-weight: 700;
+  border: none;
+  border-radius: var(--radius-lg);
+  cursor: pointer;
+  transition: all var(--transition-normal);
+  min-height: 100px;
+  position: relative;
+  overflow: hidden;
+}
+
+.scan-btn::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(255,255,255,0.15) 0%, transparent 100%);
+  pointer-events: none;
+}
+
+.scan-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none !important;
+}
+
+.scan-btn-checkin {
+  background: linear-gradient(135deg, #059669, #10b981);
+  color: #fff;
+  box-shadow: 0 4px 14px 0 rgba(5, 150, 105, 0.4);
+}
+
+.scan-btn-checkin:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px 0 rgba(5, 150, 105, 0.5);
+}
+
+.scan-btn-checkin:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.scan-btn-checkout {
+  background: linear-gradient(135deg, #dc2626, #ef4444);
+  color: #fff;
+  box-shadow: 0 4px 14px 0 rgba(220, 38, 38, 0.4);
+}
+
+.scan-btn-checkout:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px 0 rgba(220, 38, 38, 0.5);
+}
+
+.scan-btn-checkout:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.scan-btn-icon {
+  font-size: 1.75rem;
+  margin-bottom: var(--space-xs);
+}
+
+.scan-btn-text {
+  font-size: 0.9375rem;
+}
+
+/* Success / Error messages */
+.scan-message {
+  text-align: center;
+  padding: var(--space-lg);
+  border-radius: var(--radius-lg);
+  margin-top: var(--space-lg);
+  animation: slideUp 0.3s ease;
+}
+
+.scan-message-success {
+  background: linear-gradient(135deg, #ecfdf5, #d1fae5);
+  color: var(--color-success);
+  border: 1px solid var(--color-success-bg);
+}
+
+.scan-message-error {
+  background: linear-gradient(135deg, #fef2f2, #fee2e2);
+  color: var(--color-danger);
+  border: 1px solid var(--color-danger-bg);
+}
+
+.scan-message-icon {
+  font-size: 2.5rem;
+  margin-bottom: var(--space-sm);
+}
+
+.scan-message-text {
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.scan-message-detail {
+  font-size: 0.875rem;
+  margin-top: var(--space-xs);
+  opacity: 0.8;
+}
+
+/* Not found state */
+.scan-not-found {
+  text-align: center;
+  padding: var(--space-2xl);
+}
+
+.scan-not-found-icon {
+  font-size: 4rem;
+  margin-bottom: var(--space-md);
+}
+
+.scan-not-found h2 {
+  color: #fff;
+  margin-bottom: var(--space-sm);
+}
+
+.scan-not-found p {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+/* Loading spinner */
+.scan-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-2xl);
+  color: #fff;
+  gap: var(--space-md);
+}
+
+.spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid rgba(255, 255, 255, 0.3);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Footer */
+.scan-footer {
+  text-align: center;
+  padding: var(--space-md);
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 0.75rem;
+}
+
+/* Mobile optimizations */
+@media (max-width: 480px) {
+  .scan-container {
+    padding: var(--space-md);
+  }
+
+  .scan-card {
+    padding: var(--space-lg);
+  }
+
+  .scan-time {
+    font-size: 2rem;
+  }
+
+  .scan-btn {
+    min-height: 85px;
+    padding: var(--space-md);
+  }
+}
+
+/* Landscape mobile */
+@media (max-height: 600px) and (orientation: landscape) {
+  .scan-container {
+    justify-content: flex-start;
+    padding-top: var(--space-md);
+  }
+
+  .scan-datetime {
+    padding: var(--space-sm);
+    margin-bottom: var(--space-md);
+  }
+
+  .scan-time {
+    font-size: 1.75rem;
+  }
+}
