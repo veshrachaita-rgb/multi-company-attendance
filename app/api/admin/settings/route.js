@@ -41,7 +41,7 @@ export async function PUT(request) {
     const admin = await getAdminUser();
     if (!admin) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
-    const { officeStartTime, officeEndTime, lateAfterTime, companyId } = await request.json();
+    const { officeStartTime, officeEndTime, lateAfterTime, companyId, officeLatitude, officeLongitude } = await request.json();
     const effectiveCompanyId = admin.role === 'company_admin' ? admin.company_id : companyId;
 
     if (!effectiveCompanyId) {
@@ -61,6 +61,8 @@ export async function PUT(request) {
         office_start_time: officeStartTime,
         office_end_time: officeEndTime,
         late_after_time: lateAfterTime,
+        office_latitude: officeLatitude || null,
+        office_longitude: officeLongitude || null,
       }, { onConflict: 'company_id' })
       .select()
       .single();

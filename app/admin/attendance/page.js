@@ -15,11 +15,15 @@ export default function AdminAttendancePage() {
     staffId: '',
     status: '',
   });
-  const [filterMode, setFilterMode] = useState('date'); // 'date' or 'month'
+  const [filterMode, setFilterMode] = useState('date');
   const [showEditModal, setShowEditModal] = useState(false);
   const [editRecord, setEditRecord] = useState(null);
   const [editForm, setEditForm] = useState({ status: '', remarks: '' });
   const [saving, setSaving] = useState(false);
+
+  // For selfie modal
+  const [showImageModal, setShowImageModal] = useState(false);
+  const [modalImageSrc, setModalImageSrc] = useState('');
 
   useEffect(() => {
     loadInitial();
@@ -124,6 +128,12 @@ export default function AdminAttendancePage() {
     });
   }
 
+  function openImage(url) {
+    if (!url) return;
+    setModalImageSrc(url);
+    setShowImageModal(true);
+  }
+
   if (loading) {
     return <div className="loading" style={{ padding: '2rem', textAlign: 'center' }}>Loading...</div>;
   }
@@ -136,30 +146,19 @@ export default function AdminAttendancePage() {
         <h1>Attendance Records</h1>
       </div>
 
-      {/* Filters */}
       <div className="filter-bar">
         {isSuperAdmin && companies.length > 1 && (
           <div className="form-group">
             <label className="form-label">Company</label>
-            <select
-              className="form-select"
-              value={filters.companyId}
-              onChange={e => setFilters({ ...filters, companyId: e.target.value })}
-            >
-              {companies.map(c => (
-                <option key={c.id} value={c.id}>{c.company_name}</option>
-              ))}
+            <select className="form-select" value={filters.companyId} onChange={e => setFilters({ ...filters, companyId: e.target.value })}>
+              {companies.map(c => <option key={c.id} value={c.id}>{c.company_name}</option>)}
             </select>
           </div>
         )}
 
         <div className="form-group">
           <label className="form-label">View By</label>
-          <select
-            className="form-select"
-            value={filterMode}
-            onChange={e => setFilterMode(e.target.value)}
-          >
+          <select className="form-select" value={filterMode} onChange={e => setFilterMode(e.target.value)}>
             <option value="date">Date</option>
             <option value="month">Month</option>
           </select>
@@ -168,46 +167,26 @@ export default function AdminAttendancePage() {
         {filterMode === 'date' ? (
           <div className="form-group">
             <label className="form-label">Date</label>
-            <input
-              type="date"
-              className="form-input"
-              value={filters.date}
-              onChange={e => setFilters({ ...filters, date: e.target.value })}
-            />
+            <input type="date" className="form-input" value={filters.date} onChange={e => setFilters({ ...filters, date: e.target.value })} />
           </div>
         ) : (
           <div className="form-group">
             <label className="form-label">Month</label>
-            <input
-              type="month"
-              className="form-input"
-              value={filters.month}
-              onChange={e => setFilters({ ...filters, month: e.target.value })}
-            />
+            <input type="month" className="form-input" value={filters.month} onChange={e => setFilters({ ...filters, month: e.target.value })} />
           </div>
         )}
 
         <div className="form-group">
           <label className="form-label">Staff</label>
-          <select
-            className="form-select"
-            value={filters.staffId}
-            onChange={e => setFilters({ ...filters, staffId: e.target.value })}
-          >
+          <select className="form-select" value={filters.staffId} onChange={e => setFilters({ ...filters, staffId: e.target.value })}>
             <option value="">All Staff</option>
-            {staffList.filter(s => s.status === 'active').map(s => (
-              <option key={s.id} value={s.id}>{s.name}</option>
-            ))}
+            {staffList.filter(s => s.status === 'active').map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
           </select>
         </div>
 
         <div className="form-group">
           <label className="form-label">Status</label>
-          <select
-            className="form-select"
-            value={filters.status}
-            onChange={e => setFilters({ ...filters, status: e.target.value })}
-          >
+          <select className="form-select" value={filters.status} onChange={e => setFilters({ ...filters, status: e.target.value })}>
             <option value="">All Statuses</option>
             <option value="Present">Present</option>
             <option value="Late">Late</option>
@@ -219,15 +198,23 @@ export default function AdminAttendancePage() {
         </div>
       </div>
 
-      {/* Attendance Table */}
-      <div className="table-container">
-        <table className="table">
+      <div className="table-container" style={{ overflowX: 'auto' }}>
+        <table className="table" style={{ whiteSpace: 'nowrap' }}>
           <thead>
             <tr>
               <th>Staff Name</th>
               <th>Date</th>
-              <th>Check In</th>
-              <th>Check Out</th>
+              <th>Check In Time</th>
+              <th>Check In Selfie</th>
+              <th>Check In Location</th>
+              <th>Distance (m)</th>
+              <th>Lunch Out</th>
+              <th>Lunch In</th>
+              <th>Lunch Mins</th>
+              <th>Check Out Time</th>
+              <th>Check Out Selfie</th>
+              <th>Check Out Location</th>
+              <th>Distance (m)</th>
               <th>Total Hours</th>
               <th>Status</th>
               <th>Remarks</th>
@@ -241,19 +228,49 @@ export default function AdminAttendancePage() {
                 <td>{formatDate(record.date)}</td>
                 <td>{formatTime(record.check_in_time)}</td>
                 <td>
+                  {record.check_in_photo_url ? (
+                    <img 
+                      src={record.check_in_photo_url} 
+                      alt="Check In" 
+                      style={{ width: '40px', height: '40px', objectFit: 'cover', borderRadius: '4px', cursor: 'pointer', border: '1px solid #ddd' }}
+                      onClick={() => openImage(record.check_in_photo_url)}
+                    />
+                  ) : '-'}
+                </td>
+                <td>{record.check_in_latitude ? `${record.check_in_latitude.toFixed(5)}, ${record.check_in_longitude.toFixed(5)}` : '-'}</td>
+                <td>{record.check_in_distance_meters !== null ? Math.round(record.check_in_distance_meters) : '-'}</td>
+                
+                <td>{formatTime(record.lunch_out_time)}</td>
+                <td>{formatTime(record.lunch_in_time)}</td>
+                <td>{record.lunch_duration_minutes || '-'}</td>
+
+                <td>
                   {record.check_out_time
                     ? formatTime(record.check_out_time)
                     : record.status === 'Pending Checkout'
                     ? <span className="text-warning">Pending</span>
                     : '-'}
                 </td>
+                <td>
+                  {record.check_out_photo_url ? (
+                    <img 
+                      src={record.check_out_photo_url} 
+                      alt="Check Out" 
+                      style={{ width: '40px', height: '40px', objectFit: 'cover', borderRadius: '4px', cursor: 'pointer', border: '1px solid #ddd' }}
+                      onClick={() => openImage(record.check_out_photo_url)}
+                    />
+                  ) : '-'}
+                </td>
+                <td>{record.check_out_latitude ? `${record.check_out_latitude.toFixed(5)}, ${record.check_out_longitude.toFixed(5)}` : '-'}</td>
+                <td>{record.check_out_distance_meters !== null ? Math.round(record.check_out_distance_meters) : '-'}</td>
+                
                 <td>{record.total_hours || '-'}</td>
                 <td>
                   <span className={`badge badge-${record.status?.toLowerCase().replace(' ', '-') || 'pending'}`}>
                     {record.status}
                   </span>
                 </td>
-                <td className="text-secondary" style={{ maxWidth: '200px', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                <td className="text-secondary" style={{ maxWidth: '150px', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                   {record.remarks || '-'}
                 </td>
                 <td>
@@ -263,8 +280,8 @@ export default function AdminAttendancePage() {
             ))}
             {attendance.length === 0 && (
               <tr>
-                <td colSpan="8" className="text-center text-muted" style={{ padding: '2rem' }}>
-                  No attendance records found for the selected filters
+                <td colSpan="17" className="text-center text-muted" style={{ padding: '2rem' }}>
+                  No attendance records found
                 </td>
               </tr>
             )}
@@ -272,7 +289,6 @@ export default function AdminAttendancePage() {
         </table>
       </div>
 
-      {/* Edit Modal */}
       {showEditModal && editRecord && (
         <div className="modal-overlay" onClick={() => setShowEditModal(false)}>
           <div className="modal" onClick={e => e.stopPropagation()}>
@@ -318,6 +334,20 @@ export default function AdminAttendancePage() {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {showImageModal && (
+        <div className="modal-overlay" onClick={() => setShowImageModal(false)} style={{ zIndex: 9999 }}>
+          <div style={{ position: 'relative', background: '#fff', padding: '10px', borderRadius: '8px', maxWidth: '90vw', maxHeight: '90vh' }} onClick={e => e.stopPropagation()}>
+            <button 
+              onClick={() => setShowImageModal(false)}
+              style={{ position: 'absolute', top: '-15px', right: '-15px', background: '#000', color: '#fff', border: 'none', borderRadius: '50%', width: '30px', height: '30px', cursor: 'pointer', fontSize: '16px' }}
+            >
+              ×
+            </button>
+            <img src={modalImageSrc} alt="Full Size Selfie" style={{ maxWidth: '100%', maxHeight: 'calc(90vh - 20px)', objectFit: 'contain' }} />
           </div>
         </div>
       )}

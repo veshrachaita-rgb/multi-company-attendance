@@ -10,6 +10,8 @@ export default function AdminSettingsPage() {
     officeStartTime: '10:00',
     officeEndTime: '19:00',
     lateAfterTime: '10:15',
+    officeLatitude: '',
+    officeLongitude: '',
   });
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -52,6 +54,8 @@ export default function AdminSettingsPage() {
           officeStartTime: data.settings.office_start_time || '10:00',
           officeEndTime: data.settings.office_end_time || '19:00',
           lateAfterTime: data.settings.late_after_time || '10:15',
+          officeLatitude: data.settings.office_latitude || '',
+          officeLongitude: data.settings.office_longitude || '',
         });
       }
     } catch (err) {
@@ -150,6 +154,31 @@ export default function AdminSettingsPage() {
                 onChange={e => setSettings({ ...settings, officeEndTime: e.target.value })}
                 required
               />
+            </div>
+
+            <div className="form-group">
+              <label className="form-label">Office Latitude (GPS)</label>
+              <input
+                type="number"
+                step="any"
+                className="form-input"
+                value={settings.officeLatitude}
+                onChange={e => setSettings({ ...settings, officeLatitude: parseFloat(e.target.value) })}
+                required
+              />
+            </div>
+
+            <div className="form-group">
+              <label className="form-label">Office Longitude (GPS)</label>
+              <input
+                type="number"
+                step="any"
+                className="form-input"
+                value={settings.officeLongitude}
+                onChange={e => setSettings({ ...settings, officeLongitude: parseFloat(e.target.value) })}
+                required
+              />
+              <small className="text-muted">Staff must be within 50 meters of these coordinates to check in/out.</small>
             </div>
 
             <button type="submit" className="btn btn-primary" disabled={saving}>
