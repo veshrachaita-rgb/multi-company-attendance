@@ -18,6 +18,7 @@ export default function ScanPage(props) {
   const [deviceId, setDeviceId] = useState('');
   const [isRegistered, setIsRegistered] = useState(false);
   const [registeredStaff, setRegisteredStaff] = useState(null);
+  const [todayAttendance, setTodayAttendance] = useState(null);
   
   const [currentTime, setCurrentTime] = useState('');
   const [currentDate, setCurrentDate] = useState('');
@@ -63,6 +64,7 @@ export default function ScanPage(props) {
         if (devData.registered && devData.staff) {
           setIsRegistered(true);
           setRegisteredStaff(devData.staff);
+          setTodayAttendance(devData.attendance);
         } else {
           // If not registered, load all staff so they can register
           const staffRes = await fetch(`/api/staff?companyId=${companyData.company.id}`);
@@ -243,6 +245,16 @@ export default function ScanPage(props) {
           text: data.message,
           detail: data.status ? `Status: ${data.status}` : undefined
         });
+        
+        // Update local state to reflect new button options
+        setTodayAttendance(prev => {
+          const updated = prev ? { ...prev } : {};
+          if (action === 'checkin') updated.check_in_time = new Date().toISOString();
+          if (action === 'lunchout') updated.lunch_out_time = new Date().toISOString();
+          if (action === 'lunchin') updated.lunch_in_time = new Date().toISOString();
+          if (action === 'checkout') updated.check_out_time = new Date().toISOString();
+          return updated;
+        });
       } else {
         setMessage({ type: 'error', text: data.error });
       }
@@ -345,22 +357,40 @@ export default function ScanPage(props) {
 
               {!cameraActive && (
                 <div className="scan-buttons" style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                  <div style={{ display: 'flex', gap: '0.5rem' }}>
+                  {!todayAttendance?.check_in_time && (
                     <button className="scan-btn scan-btn-checkin" onClick={() => startAttendanceAction('checkin')} disabled={submitting}>
                       📥 Check In
                     </button>
-                    <button className="scan-btn scan-btn-checkout" onClick={() => startAttendanceAction('checkout')} disabled={submitting}>
-                      📤 Check Out
-                    </button>
-                  </div>
-                  <div style={{ display: 'flex', gap: '0.5rem' }}>
-                    <button className="scan-btn" style={{ flex: 1, background: '#f59e0b', color: '#fff' }} onClick={() => startAttendanceAction('lunchout')} disabled={submitting}>
-                      🍔 Lunch Out
-                    </button>
-                    <button className="scan-btn" style={{ flex: 1, background: '#10b981', color: '#fff' }} onClick={() => startAttendanceAction('lunchin')} disabled={submitting}>
+                  )}
+
+                  {todayAttendance?.check_in_time && !todayAttendance?.lunch_out_time && !todayAttendance?.check_out_time && (
+                    <div style={{ display: 'flex', gap: '0.5rem' }}>
+                      <button className="scan-btn" style={{ flex: 1, background: '#f59e0b', color: '#fff' }} onClick={() => startAttendanceAction('lunchout')} disabled={submitting}>
+                        🍔 Lunch Out
+                      </button>
+                      <button className="scan-btn scan-btn-checkout" style={{ flex: 1 }} onClick={() => startAttendanceAction('checkout')} disabled={submitting}>
+                        📤 Check Out
+                      </button>
+                    </div>
+                  )}
+
+                  {todayAttendance?.lunch_out_time && !todayAttendance?.lunch_in_time && (
+                    <button className="scan-btn" style={{ width: '100%', background: '#10b981', color: '#fff' }} onClick={() => startAttendanceAction('lunchin')} disabled={submitting}>
                       💼 Lunch In
                     </button>
-                  </div>
+                  )}
+
+                  {todayAttendance?.lunch_in_time && !todayAttendance?.check_out_time && (
+                    <button className="scan-btn scan-btn-checkout" style={{ width: '100%' }} onClick={() => startAttendanceAction('checkout')} disabled={submitting}>
+                      📤 Check Out
+                    </button>
+                  )}
+
+                  {todayAttendance?.check_out_time && (
+                    <div style={{ padding: '1rem', background: '#d1fae5', color: '#065f46', borderRadius: '8px', textAlign: 'center', fontWeight: 'bold' }}>
+                      🎉 You have completed your shift for today!
+                    </div>
+                  )}
                 </div>
               )}
             </div>
