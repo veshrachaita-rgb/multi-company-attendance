@@ -1,9 +1,10 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, use } from 'react';
 import '../scan.css';
 
-export default function ScanPage({ params }) {
+export default function ScanPage(props) {
+  const params = use(props.params);
   const { slug } = params;
   const [company, setCompany] = useState(null);
   const [staffList, setStaffList] = useState([]);
