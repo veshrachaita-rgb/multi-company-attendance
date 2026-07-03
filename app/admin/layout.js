@@ -44,8 +44,14 @@ export default function AdminLayout({ children }) {
   const pathname = usePathname();
 
   useEffect(() => {
-    if (pathname === '/admin/login') return;
+    if (pathname === '/admin/login') {
+      setLoading(false);
+      return;
+    }
     
+    // Only fetch admin info once — not on every pathname change
+    if (admin) return;
+
     async function loadAdmin() {
       try {
         const res = await fetch('/api/admin/dashboard');
@@ -61,7 +67,8 @@ export default function AdminLayout({ children }) {
       setLoading(false);
     }
     loadAdmin();
-  }, [router, pathname]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // Skip layout for login page
   if (pathname === '/admin/login') {
