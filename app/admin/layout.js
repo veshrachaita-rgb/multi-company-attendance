@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
+import Link from 'next/link';
 import { createClient } from '@/lib/supabase/client';
 import './admin.css';
 
@@ -112,19 +113,15 @@ export default function AdminLayout({ children }) {
             item.section ? (
               <div key={i} className="sidebar-section">{item.section}</div>
             ) : (
-              <a
+              <Link
                 key={i}
                 href={item.href}
                 className={`sidebar-link ${pathname === item.href ? 'active' : ''}`}
-                onClick={(e) => {
-                  e.preventDefault();
-                  setSidebarOpen(false);
-                  router.push(item.href);
-                }}
+                onClick={() => setSidebarOpen(false)}
               >
                 <span className="sidebar-link-icon">{item.icon}</span>
                 {item.label}
-              </a>
+              </Link>
             )
           )}
         </nav>
