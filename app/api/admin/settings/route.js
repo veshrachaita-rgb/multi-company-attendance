@@ -18,7 +18,7 @@ export async function GET(request) {
     const supabase = createAdminClient();
     const { data, error } = await supabase
       .from('settings')
-      .select('*')
+      .select('*, companies(company_name)')
       .eq('company_id', effectiveCompanyId)
       .single();
 
@@ -33,6 +33,7 @@ export async function GET(request) {
         accountant_end_time: '19:00',
         accountant_late_after_time: '10:15',
       },
+      companyName: data?.companies?.company_name || ''
     });
   } catch (err) {
     return NextResponse.json({ error: err.message }, { status: 500 });
@@ -44,18 +45,47 @@ export async function PUT(request) {
     const admin = await getAdminUser();
     if (!admin) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
-    const { officeStartTime, officeEndTime, lateAfterTime, accountantStartTime, accountantEndTime, accountantLateAfterTime, companyId, officeLatitude, officeLongitude } = await request.json();
-    const effectiveCompanyId = admin.role === 'company_admin' ? admin.company_id : companyId;
-
-    if (!effectiveCompanyId) {
-      return NextResponse.json({ error: 'Company ID required' }, { status: 400 });
-    }
+    const { companyName, officeStartTime, officeEndTime, lateAfterTime, accountantStartTime, accountantEndTime, accountantLateAfterTime, companyId, officeLatitude, officeLongitude } = await request.json();
+    let effectiveCompanyId = admin.role === 'company_admin' ? admin.company_id : companyId;
 
     if (admin.role === 'company_admin' && companyId && companyId !== admin.company_id) {
       return NextResponse.json({ error: 'Access denied' }, { status: 403 });
     }
 
     const supabase = createAdminClient();
+
+    if (!effectiveCompanyId) {
+      if (!companyName) {
+        return NextResponse.json({ error: 'Company ID required' }, { status: 400 });
+      }
+      
+      // Auto-create company
+      const companySlug = companyName.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+      const { data: newCompany, error: createErr } = await supabase
+        .from('companies')
+        .insert({
+          company_name: companyName,
+          company_slug: companySlug || 'default-slug',
+          status: 'active'
+        })
+        .select()
+        .single();
+        
+      if (createErr) throw createErr;
+      effectiveCompanyId = newCompany.id;
+      
+      // If super_admin, we don't strictly need to assign it to them, but if company_admin, they need it.
+      // But if they are the ones creating it, we might want to link them if they don't have one.
+      if (admin.role === 'company_admin' && !admin.company_id) {
+        await supabase.from('admin_users').update({ company_id: effectiveCompanyId }).eq('id', admin.id);
+      }
+    } else if (companyName) {
+      // Update existing company name
+      await supabase
+        .from('companies')
+        .update({ company_name: companyName })
+        .eq('id', effectiveCompanyId);
+    }
 
     const { data, error } = await supabase
       .from('settings')

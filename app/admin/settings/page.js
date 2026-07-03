@@ -7,6 +7,7 @@ export default function AdminSettingsPage() {
   const [admin, setAdmin] = useState(null);
   const [selectedCompany, setSelectedCompany] = useState('');
   const [settings, setSettings] = useState({
+    companyName: '',
     officeStartTime: '10:00',
     officeEndTime: '19:00',
     lateAfterTime: '10:15',
@@ -54,6 +55,7 @@ export default function AdminSettingsPage() {
       const data = await res.json();
       if (data.settings) {
         setSettings({
+          companyName: data.companyName || '',
           officeStartTime: data.settings.office_start_time || '10:00',
           officeEndTime: data.settings.office_end_time || '19:00',
           lateAfterTime: data.settings.late_after_time || '10:15',
@@ -128,6 +130,18 @@ export default function AdminSettingsPage() {
           )}
 
           <form onSubmit={handleSave}>
+            <div className="form-group">
+              <label className="form-label">Company Name</label>
+              <input
+                type="text"
+                className="form-input"
+                value={settings.companyName}
+                onChange={e => setSettings({ ...settings, companyName: e.target.value })}
+                required
+                placeholder="e.g. Acme Corporation"
+              />
+            </div>
+
             <div className="form-group">
               <label className="form-label">Office Start Time</label>
               <input
