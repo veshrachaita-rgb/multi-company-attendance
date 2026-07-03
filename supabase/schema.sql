@@ -46,6 +46,7 @@ CREATE TABLE staff (
   company_id UUID NOT NULL REFERENCES companies(id) ON DELETE CASCADE,
   name TEXT NOT NULL,
   employee_code TEXT,
+  role TEXT DEFAULT 'Normal Staff',
   status TEXT NOT NULL DEFAULT 'active' CHECK (status IN ('active', 'inactive')),
   created_at TIMESTAMPTZ DEFAULT NOW(),
   updated_at TIMESTAMPTZ DEFAULT NOW(),
@@ -125,6 +126,9 @@ CREATE TABLE settings (
   office_start_time TIME DEFAULT '10:00',
   office_end_time TIME DEFAULT '19:00',
   late_after_time TIME DEFAULT '10:15',
+  accountant_start_time TIME DEFAULT '10:00',
+  accountant_end_time TIME DEFAULT '19:00',
+  accountant_late_after_time TIME DEFAULT '10:15',
   created_at TIMESTAMPTZ DEFAULT NOW(),
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );

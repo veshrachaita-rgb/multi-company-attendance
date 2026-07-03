@@ -10,6 +10,9 @@ export default function AdminSettingsPage() {
     officeStartTime: '10:00',
     officeEndTime: '19:00',
     lateAfterTime: '10:15',
+    accountantStartTime: '10:00',
+    accountantEndTime: '19:00',
+    accountantLateAfterTime: '10:15',
     officeLatitude: '',
     officeLongitude: '',
   });
@@ -54,6 +57,9 @@ export default function AdminSettingsPage() {
           officeStartTime: data.settings.office_start_time || '10:00',
           officeEndTime: data.settings.office_end_time || '19:00',
           lateAfterTime: data.settings.late_after_time || '10:15',
+          accountantStartTime: data.settings.accountant_start_time || '10:00',
+          accountantEndTime: data.settings.accountant_end_time || '19:00',
+          accountantLateAfterTime: data.settings.accountant_late_after_time || '10:15',
           officeLatitude: data.settings.office_latitude || '',
           officeLongitude: data.settings.office_longitude || '',
         });
@@ -114,7 +120,7 @@ export default function AdminSettingsPage() {
 
       <div className="card" style={{ maxWidth: '500px' }}>
         <div className="card-header">
-          <h3>Office Hours</h3>
+          <h3>Office Hours (Normal Staff)</h3>
         </div>
         <div className="card-body">
           {message && (
@@ -155,6 +161,40 @@ export default function AdminSettingsPage() {
                 required
               />
             </div>
+
+            <h4 style={{ marginTop: '2rem', marginBottom: '1rem' }}>Accountant Hours</h4>
+            <div className="form-group">
+              <label className="form-label">Accountant Start Time</label>
+              <input
+                type="time"
+                className="form-input"
+                value={settings.accountantStartTime}
+                onChange={e => setSettings({ ...settings, accountantStartTime: e.target.value })}
+                required
+              />
+            </div>
+            <div className="form-group">
+              <label className="form-label">Accountant Late After Time</label>
+              <input
+                type="time"
+                className="form-input"
+                value={settings.accountantLateAfterTime}
+                onChange={e => setSettings({ ...settings, accountantLateAfterTime: e.target.value })}
+                required
+              />
+            </div>
+            <div className="form-group">
+              <label className="form-label">Accountant End Time</label>
+              <input
+                type="time"
+                className="form-input"
+                value={settings.accountantEndTime}
+                onChange={e => setSettings({ ...settings, accountantEndTime: e.target.value })}
+                required
+              />
+            </div>
+
+            <h4 style={{ marginTop: '2rem', marginBottom: '1rem' }}>Location Settings</h4>
 
             <div className="form-group">
               <label className="form-label">Office Latitude (GPS)</label>

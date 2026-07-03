@@ -65,3 +65,12 @@ WITH CHECK (bucket_id = 'attendance-selfies');
 CREATE POLICY "Public View Selfies" 
 ON storage.objects FOR SELECT 
 USING (bucket_id = 'attendance-selfies');
+
+-- 5. Add role to staff and accountant timings to settings
+ALTER TABLE staff
+  ADD COLUMN IF NOT EXISTS role TEXT DEFAULT 'Normal Staff';
+
+ALTER TABLE settings
+  ADD COLUMN IF NOT EXISTS accountant_start_time TIME DEFAULT '10:00',
+  ADD COLUMN IF NOT EXISTS accountant_end_time TIME DEFAULT '19:00',
+  ADD COLUMN IF NOT EXISTS accountant_late_after_time TIME DEFAULT '10:15';

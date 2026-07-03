@@ -29,6 +29,9 @@ export async function GET(request) {
         office_start_time: '10:00',
         office_end_time: '19:00',
         late_after_time: '10:15',
+        accountant_start_time: '10:00',
+        accountant_end_time: '19:00',
+        accountant_late_after_time: '10:15',
       },
     });
   } catch (err) {
@@ -41,7 +44,7 @@ export async function PUT(request) {
     const admin = await getAdminUser();
     if (!admin) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
-    const { officeStartTime, officeEndTime, lateAfterTime, companyId, officeLatitude, officeLongitude } = await request.json();
+    const { officeStartTime, officeEndTime, lateAfterTime, accountantStartTime, accountantEndTime, accountantLateAfterTime, companyId, officeLatitude, officeLongitude } = await request.json();
     const effectiveCompanyId = admin.role === 'company_admin' ? admin.company_id : companyId;
 
     if (!effectiveCompanyId) {
@@ -61,6 +64,9 @@ export async function PUT(request) {
         office_start_time: officeStartTime,
         office_end_time: officeEndTime,
         late_after_time: lateAfterTime,
+        accountant_start_time: accountantStartTime,
+        accountant_end_time: accountantEndTime,
+        accountant_late_after_time: accountantLateAfterTime,
         office_latitude: officeLatitude || null,
         office_longitude: officeLongitude || null,
       }, { onConflict: 'company_id' })

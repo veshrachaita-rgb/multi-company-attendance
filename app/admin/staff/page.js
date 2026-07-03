@@ -10,7 +10,7 @@ export default function AdminStaffPage() {
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [editStaff, setEditStaff] = useState(null);
-  const [form, setForm] = useState({ name: '', employeeCode: '', status: 'active' });
+  const [form, setForm] = useState({ name: '', employeeCode: '', status: 'active', role: 'Normal Staff' });
   const [error, setError] = useState('');
   const [saving, setSaving] = useState(false);
 
@@ -54,14 +54,19 @@ export default function AdminStaffPage() {
 
   function openAdd() {
     setEditStaff(null);
-    setForm({ name: '', employeeCode: '', status: 'active' });
+    setForm({ name: '', employeeCode: '', status: 'active', role: 'Normal Staff' });
     setError('');
     setShowModal(true);
   }
 
   function openEdit(s) {
     setEditStaff(s);
-    setForm({ name: s.name, employeeCode: s.employee_code || '', status: s.status });
+    setForm({ 
+      name: s.name, 
+      employeeCode: s.employee_code || '', 
+      status: s.status,
+      role: s.role || 'Normal Staff'
+    });
     setError('');
     setShowModal(true);
   }
@@ -151,6 +156,7 @@ export default function AdminStaffPage() {
             <tr>
               <th>Name</th>
               <th>Employee Code</th>
+              <th>Role</th>
               <th>Status</th>
               <th>Added On</th>
               <th>Actions</th>
@@ -161,6 +167,7 @@ export default function AdminStaffPage() {
               <tr key={s.id}>
                 <td style={{ fontWeight: '500' }}>{s.name}</td>
                 <td><code style={{ fontSize: '0.8125rem', background: '#f1f5f9', padding: '2px 6px', borderRadius: '4px' }}>{s.employee_code || '-'}</code></td>
+                <td><span className="badge" style={{background: '#e2e8f0', color: '#475569'}}>{s.role || 'Normal Staff'}</span></td>
                 <td><span className={`badge badge-${s.status}`}>{s.status}</span></td>
                 <td className="text-secondary">{new Date(s.created_at).toLocaleDateString('en-IN')}</td>
                 <td>
@@ -216,6 +223,17 @@ export default function AdminStaffPage() {
                     onChange={e => setForm({ ...form, employeeCode: e.target.value })}
                     placeholder="e.g. EMP001"
                   />
+                </div>
+                <div className="form-group">
+                  <label className="form-label">Role</label>
+                  <select
+                    className="form-select"
+                    value={form.role}
+                    onChange={e => setForm({ ...form, role: e.target.value })}
+                  >
+                    <option value="Normal Staff">Normal Staff</option>
+                    <option value="Accountant">Accountant</option>
+                  </select>
                 </div>
                 {editStaff && (
                   <div className="form-group">
