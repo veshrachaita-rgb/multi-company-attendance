@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { createAdminClient } from '@/lib/supabase/server';
 import { getISTDateString, formatISTTime, calculateTotalHours, isLate } from '@/lib/utils/timezone';
+import { resolveTimings } from '@/lib/utils/timings';
 import crypto from 'crypto';
 
 export const dynamic = 'force-dynamic';
@@ -45,7 +46,7 @@ export async function POST(request) {
     // Identify staff from device
     const { data: device, error: deviceError } = await supabase
       .from('staff_devices')
-      .select('staff_id, company_id, status, staff (name, status, role)')
+      .select('staff_id, company_id, status, staff (name, status, role, start_time, end_time, late_after_time)')
       .eq('device_id_hash', deviceIdHash)
       .eq('status', 'active')
       .single();
@@ -57,18 +58,15 @@ export async function POST(request) {
     const companyId = device.company_id;
     const staffId = device.staff_id;
     const staffName = device.staff.name;
-    const staffRole = device.staff.role;
 
-    // Get company settings for late threshold and office location
+    // Get company settings for role default timings and office location
     const { data: settings } = await supabase
       .from('settings')
-      .select('late_after_time, accountant_late_after_time, office_latitude, office_longitude')
+      .select('office_start_time, office_end_time, late_after_time, accountant_start_time, accountant_end_time, accountant_late_after_time, office_latitude, office_longitude')
       .eq('company_id', companyId)
       .single();
 
-    const lateAfterTime = staffRole === 'Accountant' 
-      ? (settings?.accountant_late_after_time || '10:15') 
-      : (settings?.late_after_time || '10:15');
+    const { lateAfterTime } = resolveTimings(device.staff, settings);
     const deviceInfo = request.headers.get('user-agent') || '';
     const ipAddress = request.headers.get('x-forwarded-for') || '';
 

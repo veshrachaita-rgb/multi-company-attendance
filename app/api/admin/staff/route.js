@@ -33,7 +33,7 @@ export async function POST(request) {
     const admin = await getAdminUser();
     if (!admin) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
-    const { name, employeeCode, companyId, role } = await request.json();
+    const { name, employeeCode, companyId, role, startTime, endTime, lateAfterTime } = await request.json();
     const effectiveCompanyId = admin.role === 'company_admin' ? admin.company_id : companyId;
 
     if (!name || !effectiveCompanyId) {
@@ -56,6 +56,9 @@ export async function POST(request) {
         name,
         employee_code: employeeCode || null,
         role: role || 'Normal Staff',
+        start_time: startTime || null,
+        end_time: endTime || null,
+        late_after_time: lateAfterTime || null,
         status: 'active',
       })
       .select()
@@ -82,7 +85,7 @@ export async function PUT(request) {
     const admin = await getAdminUser();
     if (!admin) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
-    const { id, name, employeeCode, status, role } = await request.json();
+    const { id, name, employeeCode, status, role, startTime, endTime, lateAfterTime } = await request.json();
     if (!id) return NextResponse.json({ error: 'Staff ID is required' }, { status: 400 });
 
     const supabase = createAdminClient();
@@ -103,6 +106,10 @@ export async function PUT(request) {
     if (employeeCode !== undefined) updates.employee_code = employeeCode;
     if (status !== undefined) updates.status = status;
     if (role !== undefined) updates.role = role || 'Normal Staff';
+    // null clears the override, sending the staff member back to their role's timings
+    if (startTime !== undefined) updates.start_time = startTime || null;
+    if (endTime !== undefined) updates.end_time = endTime || null;
+    if (lateAfterTime !== undefined) updates.late_after_time = lateAfterTime || null;
 
     const { data, error } = await supabase
       .from('staff')

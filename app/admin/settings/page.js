@@ -176,7 +176,10 @@ export default function AdminSettingsPage() {
               />
             </div>
 
-            <h4 style={{ marginTop: '2rem', marginBottom: '1rem' }}>Accountant Hours</h4>
+            <h4 style={{ marginTop: '2rem', marginBottom: '0.25rem' }}>Accountant Hours</h4>
+            <p className="text-muted" style={{ fontSize: '0.8125rem', marginBottom: '1rem' }}>
+              Default for accountants. To give someone their own timings, edit that person in Staff and tick &quot;Use custom timings&quot;.
+            </p>
             <div className="form-group">
               <label className="form-label">Accountant Start Time</label>
               <input

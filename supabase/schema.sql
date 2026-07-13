@@ -47,6 +47,10 @@ CREATE TABLE staff (
   name TEXT NOT NULL,
   employee_code TEXT,
   role TEXT DEFAULT 'Normal Staff',
+  -- NULL means inherit the timings for this staff member's role from settings
+  start_time TIME,
+  end_time TIME,
+  late_after_time TIME,
   status TEXT NOT NULL DEFAULT 'active' CHECK (status IN ('active', 'inactive')),
   created_at TIMESTAMPTZ DEFAULT NOW(),
   updated_at TIMESTAMPTZ DEFAULT NOW(),
