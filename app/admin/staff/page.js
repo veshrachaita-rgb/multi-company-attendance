@@ -1,6 +1,18 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { hasCustomTimings, toTimeInput } from '@/lib/utils/timings';
+
+const BLANK_FORM = {
+  name: '',
+  employeeCode: '',
+  status: 'active',
+  role: 'Normal Staff',
+  customTimings: false,
+  startTime: '10:00',
+  lateAfterTime: '10:15',
+  endTime: '19:00',
+};
 
 export default function AdminStaffPage() {
   const [staff, setStaff] = useState([]);
@@ -10,7 +22,7 @@ export default function AdminStaffPage() {
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [editStaff, setEditStaff] = useState(null);
-  const [form, setForm] = useState({ name: '', employeeCode: '', status: 'active', role: 'Normal Staff' });
+  const [form, setForm] = useState(BLANK_FORM);
   const [error, setError] = useState('');
   const [saving, setSaving] = useState(false);
 
@@ -54,18 +66,22 @@ export default function AdminStaffPage() {
 
   function openAdd() {
     setEditStaff(null);
-    setForm({ name: '', employeeCode: '', status: 'active', role: 'Normal Staff' });
+    setForm(BLANK_FORM);
     setError('');
     setShowModal(true);
   }
 
   function openEdit(s) {
     setEditStaff(s);
-    setForm({ 
-      name: s.name, 
-      employeeCode: s.employee_code || '', 
+    setForm({
+      name: s.name,
+      employeeCode: s.employee_code || '',
       status: s.status,
-      role: s.role || 'Normal Staff'
+      role: s.role || 'Normal Staff',
+      customTimings: hasCustomTimings(s),
+      startTime: toTimeInput(s.start_time) || BLANK_FORM.startTime,
+      lateAfterTime: toTimeInput(s.late_after_time) || BLANK_FORM.lateAfterTime,
+      endTime: toTimeInput(s.end_time) || BLANK_FORM.endTime,
     });
     setError('');
     setShowModal(true);
@@ -77,9 +93,13 @@ export default function AdminStaffPage() {
     setError('');
     try {
       const method = editStaff ? 'PUT' : 'POST';
+      const { customTimings, startTime, lateAfterTime, endTime, ...fields } = form;
+      const timings = customTimings
+        ? { startTime, lateAfterTime, endTime }
+        : { startTime: null, lateAfterTime: null, endTime: null };
       const body = editStaff
-        ? { id: editStaff.id, ...form }
-        : { ...form, companyId: selectedCompany };
+        ? { id: editStaff.id, ...fields, ...timings }
+        : { ...fields, ...timings, companyId: selectedCompany };
 
       const res = await fetch('/api/admin/staff', {
         method,
@@ -157,6 +177,7 @@ export default function AdminStaffPage() {
               <th>Name</th>
               <th>Employee Code</th>
               <th>Role</th>
+              <th>Timings</th>
               <th>Status</th>
               <th>Added On</th>
               <th>Actions</th>
@@ -168,6 +189,11 @@ export default function AdminStaffPage() {
                 <td style={{ fontWeight: '500' }}>{s.name}</td>
                 <td><code style={{ fontSize: '0.8125rem', background: '#f1f5f9', padding: '2px 6px', borderRadius: '4px' }}>{s.employee_code || '-'}</code></td>
                 <td><span className="badge" style={{background: '#e2e8f0', color: '#475569'}}>{s.role || 'Normal Staff'}</span></td>
+                <td style={{ fontSize: '0.8125rem' }}>
+                  {hasCustomTimings(s)
+                    ? `${toTimeInput(s.start_time) || '-'} – ${toTimeInput(s.end_time) || '-'}`
+                    : <span className="text-muted">Default</span>}
+                </td>
                 <td><span className={`badge badge-${s.status}`}>{s.status}</span></td>
                 <td className="text-secondary">{new Date(s.created_at).toLocaleDateString('en-IN')}</td>
                 <td>
@@ -186,7 +212,7 @@ export default function AdminStaffPage() {
             ))}
             {staff.length === 0 && (
               <tr>
-                <td colSpan="5" className="text-center text-muted" style={{ padding: '2rem' }}>
+                <td colSpan="7" className="text-center text-muted" style={{ padding: '2rem' }}>
                   No staff members. Click &quot;Add Staff&quot; to add one.
                 </td>
               </tr>
@@ -235,6 +261,58 @@ export default function AdminStaffPage() {
                     <option value="Accountant">Accountant</option>
                   </select>
                 </div>
+
+                <div className="form-group">
+                  <label className="form-label" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer' }}>
+                    <input
+                      type="checkbox"
+                      checked={form.customTimings}
+                      onChange={e => setForm({ ...form, customTimings: e.target.checked })}
+                    />
+                    Use custom timings for this person
+                  </label>
+                  <small className="text-muted">
+                    Leave this off to follow the {form.role === 'Accountant' ? 'Accountant' : 'Office'} Hours set in Settings.
+                  </small>
+                </div>
+
+                {form.customTimings && (
+                  <>
+                    <div className="form-group">
+                      <label className="form-label">Start Time</label>
+                      <input
+                        type="time"
+                        className="form-input"
+                        value={form.startTime}
+                        onChange={e => setForm({ ...form, startTime: e.target.value })}
+                        required
+                      />
+                    </div>
+                    <div className="form-group">
+                      <label className="form-label">Late After Time</label>
+                      <input
+                        type="time"
+                        className="form-input"
+                        value={form.lateAfterTime}
+                        onChange={e => setForm({ ...form, lateAfterTime: e.target.value })}
+                        required
+                      />
+                      <small className="text-muted">Only this time decides Late. Checking in after it marks them Late.</small>
+                    </div>
+                    <div className="form-group">
+                      <label className="form-label">End Time</label>
+                      <input
+                        type="time"
+                        className="form-input"
+                        value={form.endTime}
+                        onChange={e => setForm({ ...form, endTime: e.target.value })}
+                        required
+                      />
+                      <small className="text-muted">For reference only. Checking out early never marks anyone Late.</small>
+                    </div>
+                  </>
+                )}
+
                 {editStaff && (
                   <div className="form-group">
                     <label className="form-label">Status</label>

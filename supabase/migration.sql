@@ -74,3 +74,10 @@ ALTER TABLE settings
   ADD COLUMN IF NOT EXISTS accountant_start_time TIME DEFAULT '10:00',
   ADD COLUMN IF NOT EXISTS accountant_end_time TIME DEFAULT '19:00',
   ADD COLUMN IF NOT EXISTS accountant_late_after_time TIME DEFAULT '10:15';
+
+-- 6. Per-person timings. NULL means the staff member inherits the timings for
+-- their role from the settings table.
+ALTER TABLE staff
+  ADD COLUMN IF NOT EXISTS start_time TIME,
+  ADD COLUMN IF NOT EXISTS end_time TIME,
+  ADD COLUMN IF NOT EXISTS late_after_time TIME;
